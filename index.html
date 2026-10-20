@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Emlak ofisleri için örnek web sitesi tasarımı.">
+<title>Zeytin Gayrimenkul Demo</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+
+/* Layout: animated bay-at-dusk hero carries the page; limestone body; listings as photo galleries; brass for actions */
+:root{
+  --bg:#f3f1ea; --surface:#fbfaf6; --ink:#1f2a22; --muted:#5c6a5f; --line:#dcd8cb;
+  --olive:#3f5a3c; --olive-deep:#2b3f2a; --brass:#b5832f; --brass-ink:#fff8ea; --wa:#1f8f4e;
+  --demo:#1f2a22; --demo-fg:#f3f1ea;
+  --hero-fg:#fbf7ee; --hero-muted:#e9dfcd;
+  --f-display:"Young Serif", Georgia, "Times New Roman", serif;
+  --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#161c17;--surface:#1e2620;--ink:#ebe8de;--muted:#a3ae9f;--line:#334036;
+  --olive:#7f9d74;--olive-deep:#26342a;--brass:#d9a752;--brass-ink:#1c1608;--wa:#3cb873;
+  --demo:#ebe8de;--demo-fg:#161c17;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#161c17;--surface:#1e2620;--ink:#ebe8de;--muted:#a3ae9f;--line:#334036;
+  --olive:#7f9d74;--olive-deep:#26342a;--brass:#d9a752;--brass-ink:#1c1608;--wa:#3cb873;
+  --demo:#ebe8de;--demo-fg:#161c17;color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+.wrap{max-width:1140px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;text-wrap:balance;margin:0;line-height:1.15}
+a{color:inherit}
+button,input,select,textarea{font:inherit}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+.demo-bar{background:var(--demo);color:var(--demo-fg);font-size:13px}
+.demo-bar .wrap{display:flex;gap:8px 16px;flex-wrap:wrap;justify-content:space-between;align-items:center;padding-block:8px}
+.demo-bar b{letter-spacing:.06em;text-transform:uppercase;font-size:11px}
+
+header.top{background:var(--olive-deep);color:#f3f1ea}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo span{font-family:var(--f-display);font-size:22px;color:#f3f1ea}
+.logo small{display:block;font-family:var(--f-body);font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.75}
+nav.main{display:flex;gap:20px;font-size:15px;flex-wrap:wrap}
+nav.main a{text-decoration:none;color:#e6e3d6}
+nav.main a:hover{color:#fff}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:6px;padding:11px 18px;font-weight:600;cursor:pointer;text-decoration:none;font-size:15px}
+.btn-wa{background:var(--wa);color:#fff}
+.btn-brass{background:var(--brass);color:var(--brass-ink)}
+.btn-ghost{background:rgba(255,255,255,.12);color:var(--hero-fg);border:1px solid rgba(255,255,255,.35)}
+
+/* HERO with live scene */
+.hero{position:relative;overflow:hidden;background:#2a2f45;color:var(--hero-fg)}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(18,22,30,.72) 0%,rgba(18,22,30,.45) 45%,rgba(18,22,30,.05) 80%),linear-gradient(0deg,rgba(18,22,30,.55),rgba(18,22,30,0) 40%);pointer-events:none}
+.hero .wrap{position:relative;z-index:1;padding-block:72px 28px}
+.hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:40px;align-items:end}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.hero .eyebrow{color:#e8c27c}
+.hero h1{font-size:clamp(36px,5.8vw,64px);margin-top:12px;max-width:14ch}
+.hero p.lead{color:var(--hero-muted);max-width:50ch;margin:16px 0 0;font-size:18px}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.stats{display:flex;gap:28px;flex-wrap:wrap;margin-top:32px;font-variant-numeric:tabular-nums}
+.stats div{display:flex;flex-direction:column}
+.stats b{font-family:var(--f-display);font-weight:400;font-size:30px;line-height:1}
+.stats span{font-size:12px;color:var(--hero-muted);letter-spacing:.06em;text-transform:uppercase;margin-top:6px}
+.rating{display:flex;gap:14px;align-items:center;background:rgba(251,247,238,.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:18px 20px}
+.rating .score{font-family:var(--f-display);font-size:46px;line-height:1}
+.stars{color:#e8b85c;letter-spacing:2px;font-size:18px}
+.rating small{color:var(--hero-muted);display:block;font-size:13px}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--hero-muted);margin-top:10px}
+.live i{width:7px;height:7px;border-radius:50%;background:#e8b85c;display:inline-block}
+@media (prefers-reduced-motion:no-preference){.live i{animation:pulse 1.6s infinite}}
+@keyframes pulse{50%{opacity:.25}}
+
+.search{margin-top:36px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:10px;align-items:end;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;align-self:stretch}
+.seg button{background:transparent;border:0;padding:10px 16px;cursor:pointer;color:var(--muted);font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--olive);color:#fff}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600}
+.field select{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+
+.section{padding-block:44px}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.section-head h2{font-size:clamp(26px,3.4vw,36px)}
+.count{color:var(--muted);font-size:14px}
+
+/* Listings */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.gal{position:relative;aspect-ratio:4/3;max-width:100%;overflow:hidden;background:#cdbfa4}
+.slides{display:flex;height:100%;transition:transform .55s cubic-bezier(.3,.7,.2,1)}
+.slide{flex:0 0 100%;height:100%;overflow:hidden}
+.slide svg{display:block;width:100%;height:100%;transition:transform 4s ease-out}
+@media (prefers-reduced-motion:no-preference){.card:hover .slide svg{transform:scale(1.07)}}
+.tag{position:absolute;top:12px;left:12px;background:var(--surface);color:var(--ink);font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase;z-index:2}
+.tag.kira{background:var(--brass);color:var(--brass-ink)}
+.new{position:absolute;top:12px;right:12px;background:#c0462f;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:.06em;z-index:2}
+.nav-b{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;border:0;background:rgba(20,24,20,.55);color:#fff;cursor:pointer;display:grid;place-items:center;z-index:2;font-size:18px;line-height:1}
+.nav-b.prev{left:10px}.nav-b.next{right:10px}
+.gal-foot{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;padding:24px 12px 10px;background:linear-gradient(0deg,rgba(15,18,15,.6),rgba(15,18,15,0));color:#fff;font-size:12px;z-index:2}
+.dots{display:flex;gap:5px}
+.dots button{width:7px;height:7px;border-radius:50%;border:0;padding:0;background:rgba(255,255,255,.5);cursor:pointer}
+.dots button[aria-current="true"]{background:#fff;width:18px;border-radius:4px}
+.card .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.price{font-family:var(--f-display);font-size:24px}
+.price small{font-family:var(--f-body);font-size:14px;color:var(--muted)}
+.card h3{font-family:var(--f-body);font-weight:600;font-size:16px}
+.loc{color:var(--muted);font-size:14px}
+.specs{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:8px;border-top:1px solid var(--line)}
+.specs span{font-size:13px;background:var(--bg);border-radius:4px;padding:3px 8px}
+.ilan{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.empty{grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);border:1px dashed var(--line);border-radius:10px}
+
+.why{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.why div{border-top:2px solid var(--olive);padding-top:14px}
+.why h3{font-size:20px;margin-bottom:6px}
+.why p{margin:0;color:var(--muted)}
+
+.reviews{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.review{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+.review .stars{color:var(--brass)}
+.review p{margin:8px 0 12px}
+.review footer{font-size:13px;color:var(--muted)}
+.note{font-size:13px;color:var(--muted);margin-top:12px}
+
+.contact{display:grid;grid-template-columns:.9fr 1.1fr;gap:32px;align-items:start}
+.contact .lead{color:var(--muted)}
+.contact dl{margin:18px 0 0;display:grid;gap:12px}
+.contact dt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.contact dd{margin:0;font-size:17px}
+form.f{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:12px}
+form.f .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+form.f label{font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px}
+form.f input,form.f textarea,form.f select{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.ok{background:var(--olive);color:#fff;border-radius:6px;padding:10px 14px;font-size:14px}
+
+.offer{background:var(--olive-deep);color:#f3f1ea;border-radius:12px;padding:28px;display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center}
+.offer .eyebrow{color:#e8c27c}
+.offer h2{font-size:clamp(24px,3vw,32px)}
+.offer p{opacity:.85;margin:10px 0 0}
+.price-list{display:grid;gap:8px;font-variant-numeric:tabular-nums}
+.price-list div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(243,241,234,.2);padding-bottom:8px}
+.price-list .sum{font-weight:700;border:0;font-size:18px}
+
+footer.bottom{padding-block:28px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);margin-top:40px}
+footer.bottom .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+.wa-float{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));width:56px;height:56px;border-radius:50%;background:var(--wa);display:grid;place-items:center;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:5}
+
+@media (max-width:860px){
+  .hero-grid,.contact,.offer{grid-template-columns:1fr}
+  .grid,.reviews,.why{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .search{grid-template-columns:1fr 1fr}
+  .seg{grid-column:1/-1}
+}
+@media (max-width:560px){
+  .grid,.reviews,.why{grid-template-columns:1fr}
+  nav.main{display:none}
+  form.f .row{grid-template-columns:1fr}
+  .search{grid-template-columns:1fr}
+  .hero .wrap{padding-block:48px 24px}
+}
+@media (prefers-reduced-motion:no-preference){.card{transition:transform .2s,box-shadow .2s}.card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.12)}}
+</style>
+</head>
+<body>
+<div class="demo-bar"><div class="wrap">
+  <span><b>Örnek tasarım</b> · Emlak ofisinizin web sitesi böyle görünebilir. İlanlar, görseller, yorumlar ve iletişim bilgileri örnektir.</span>
+  <a href="#teklif"><b>Fiyat: 2.000 TL</b></a>
+</div></div>
+
+<header class="top"><div class="wrap">
+  <a class="logo" href="#">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><path d="M4 16 17 5l13 11v13H4z" fill="none" stroke="#d9a752" stroke-width="2.4" stroke-linejoin="round"/><ellipse cx="17" cy="20" rx="3.4" ry="5.4" fill="#d9a752" transform="rotate(30 17 20)"/></svg>
+    <span>Zeytin Gayrimenkul<small>Emlak Danışmanlığı · 2009'dan beri</small></span>
+  </a>
+  <nav class="main"><a href="#ilanlar">İlanlar</a><a href="#hakkimizda">Hakkımızda</a><a href="#yorumlar">Yorumlar</a><a href="#iletisim">İletişim</a></nav>
+  <a class="btn btn-wa" href="#iletisim">WhatsApp ile yazın</a>
+</div></header>
+
+<section class="hero">
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Satılık · Kiralık · Değerleme</div>
+        <h1>Doğru evi, doğru fiyata ve güvenle.</h1>
+        <p class="lead">Bölgeyi sokak sokak tanıyan ekibimizle portföyümüzdeki daire, villa ve iş yerlerini 7/24 inceleyin. Beğendiğiniz ilan için tek tıkla bize ulaşın.</p>
+        <div class="cta"><a class="btn btn-brass" href="#ilanlar">İlanları incele</a><a class="btn btn-ghost" href="#iletisim">Mülkümü değerlendir</a></div>
+        <div class="stats">
+          <div><b data-to="17">17</b><span>Yıllık tecrübe</span></div>
+          <div><b data-to="320" data-plus>320+</b><span>Satılan mülk</span></div>
+          <div><b data-to="85">85</b><span>Aktif ilan</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="rating" aria-label="Google puanı">
+          <div class="score">4,9</div>
+          <div><div class="stars" aria-hidden="true">★★★★★</div><small>Google'da 214 değerlendirme (örnek)</small><small>Gerçek puanınız burada yer alır.</small></div>
+        </div>
+        <div class="live"><i></i>Site 7/24 açık · Rakamlar örnektir</div>
+      </div>
+    </div>
+
+    <div class="search" role="search">
+      <div class="seg" role="group" aria-label="İlan türü">
+        <button type="button" id="t-all" aria-pressed="true" data-type="all">Tümü</button>
+        <button type="button" id="t-satilik" aria-pressed="false" data-type="satilik">Satılık</button>
+        <button type="button" id="t-kiralik" aria-pressed="false" data-type="kiralik">Kiralık</button>
+      </div>
+      <div class="field"><label for="f-oda">Oda sayısı</label>
+        <select id="f-oda"><option value="">Hepsi</option><option>1+1</option><option>2+1</option><option>3+1</option><option>4+1</option></select></div>
+      <div class="field"><label for="f-tip">Emlak tipi</label>
+        <select id="f-tip"><option value="">Hepsi</option><option>Daire</option><option>Villa</option><option>İş yeri</option></select></div>
+      <div class="field"><label for="f-sirala">Sırala</label>
+        <select id="f-sirala"><option value="yeni">En yeni</option><option value="ucuz">Fiyat (artan)</option><option value="pahali">Fiyat (azalan)</option></select></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="ilanlar"><div class="wrap">
+  <div class="section-head"><h2>Güncel ilanlar</h2><span class="count" id="count"></span></div>
+  <div class="grid" id="grid"></div>
+</div></section>
+
+<section class="section" id="hakkimizda"><div class="wrap">
+  <div class="section-head"><h2>Neden Zeytin Gayrimenkul?</h2></div>
+  <div class="why">
+    <div><h3>Yetki belgeli danışmanlar</h3><p>Taşınmaz Ticareti Yetki Belgesi'ne sahip ekibimiz alım, satım ve kiralamada yanınızda.</p></div>
+    <div><h3>Tapuya kadar takip</h3><p>Ekspertiz, kredi başvurusu ve tapu randevusu dahil tüm süreci sizin yerinize koordine ediyoruz.</p></div>
+    <div><h3>Doğru değerleme</h3><p>Mülkünüzü bölgedeki güncel satışlarla karşılaştırarak gerçekçi bir fiyatla piyasaya çıkarıyoruz.</p></div>
+  </div>
+</div></section>
+
+<section class="section" id="yorumlar"><div class="wrap">
+  <div class="section-head"><h2>Müşterilerimiz ne diyor?</h2></div>
+  <div class="reviews">
+    <article class="review"><div class="stars" aria-label="5 yıldız">★★★★★</div><p>Örnek yorum: Evimizi üç haftada sattık, her adımda bilgilendirildik.</p><footer>Örnek müşteri · Google</footer></article>
+    <article class="review"><div class="stars" aria-label="5 yıldız">★★★★★</div><p>Örnek yorum: Kiralık ararken bütçemize uygun seçenekleri hızlıca gösterdiler.</p><footer>Örnek müşteri · Google</footer></article>
+    <article class="review"><div class="stars" aria-label="5 yıldız">★★★★★</div><p>Örnek yorum: Tapu işlemlerinde çok yardımcı oldular, kesinlikle tavsiye ederim.</p><footer>Örnek müşteri · Google</footer></article>
+  </div>
+  <p class="note">Sitenizde gerçek Google yorumlarınız gösterilir. Buradaki metinler yalnızca örnektir.</p>
+</div></section>
+
+<section class="section" id="iletisim"><div class="wrap">
+  <div class="contact">
+    <div>
+      <h2>Mülkünüz için konuşalım</h2>
+      <p class="lead">Satmak, kiralamak ya da değerini öğrenmek mi istiyorsunuz? Formu doldurun, aynı gün dönüş yapalım.</p>
+      <dl>
+        <div><dt>Telefon / WhatsApp</dt><dd>0 5XX XXX XX XX (örnek)</dd></div>
+        <div><dt>Adres</dt><dd>Örnek Mah. Cumhuriyet Cad. No: 12</dd></div>
+        <div><dt>Çalışma saatleri</dt><dd>Pzt–Cmt 09:00–19:00 · Site 7/24 açık</dd></div>
+      </dl>
+    </div>
+    <form class="f" id="form">
+      <div class="row">
+        <div><label for="c-ad">Adınız</label><input id="c-ad" required placeholder="Ad Soyad"></div>
+        <div><label for="c-tel">Telefon</label><input id="c-tel" required inputmode="tel" placeholder="05XX XXX XX XX"></div>
+      </div>
+      <div><label for="c-konu">Konu</label><select id="c-konu"><option>Ev almak istiyorum</option><option>Evimi satmak istiyorum</option><option>Kiralık arıyorum</option><option>Değerleme istiyorum</option></select></div>
+      <div><label for="c-mesaj">Mesajınız</label><textarea id="c-mesaj" rows="4" placeholder="Bölge, bütçe, oda sayısı..."></textarea></div>
+      <button class="btn btn-brass" type="submit">Mesajı gönder</button>
+      <div class="ok" id="ok" hidden>Örnek form: Gerçek sitenizde bu mesaj doğrudan size ve WhatsApp'ınıza iletilir.</div>
+    </form>
+  </div>
+</div></section>
+
+<section class="section" id="teklif"><div class="wrap">
+  <div class="offer">
+    <div>
+      <div class="eyebrow">Emlak ofisleri için</div>
+      <h2>Bu siteyi kendi ofisinizin adı, ilan fotoğrafları ve Google yorumlarıyla hazırlayalım.</h2>
+      <p>Mobil uyumlu, Google'da bulunabilir, WhatsApp butonlu ve iletişim formlu profesyonel bir site. Arka planda kendi bölgenizin videosu ve ilanlarınızın gerçek fotoğrafları yer alır. Alan adınıza bağlı olarak teslim edilir.</p>
+    </div>
+    <div class="price-list">
+      <div><span>Web sitesi tasarımı ve kurulumu</span><span>1.000 TL</span></div>
+      <div><span>Alan adı (domain) ve bağlantısı</span><span>1.000 TL</span></div>
+      <div class="sum"><span>Toplam</span><span>2.000 TL</span></div>
+    </div>
+  </div>
+</div></section>
+
+<footer class="bottom"><div class="wrap">
+  <span>© Zeytin Gayrimenkul (örnek firma) · Bu sayfa bir tasarım örneğidir.</span>
+  <span>Tasarım: [Adınız / Firma unvanı]</span>
+</div></footer>
+
+<a class="wa-float" href="#iletisim" aria-label="WhatsApp ile iletişim">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.2.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg>
+</a>
+
+<script>
+const REDUCE = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- Live hero scene: bay at golden hour → dusk ---------- */
+(function(){
+  const cv=document.getElementById("scene"); if(!cv||!cv.getContext) return;
+  const ctx=cv.getContext("2d");
+  let W=0,H=0,dpr=1,city=[],far=[],clouds=[],shimmer=[];
+  function rnd(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  function hex(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]}
+  function mix(a,b,k){const A=hex(a),B=hex(b);return`rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*k)).join(",")})`}
+  function build(){
+    const r=rnd(42); city=[];far=[];clouds=[];shimmer=[];
+    let x=-40; while(x<W*0.95){const w=26+r()*46,h=H*(0.10+r()*0.24);const cols=Math.max(2,Math.floor(w/11)),rows=Math.max(3,Math.floor(h/15));const thr=[];for(let i=0;i<cols*rows;i++)thr.push(0.35+r()*0.6);city.push({x,w,h,cols,rows,thr,shade:r()});x+=w+2+r()*6;}
+    x=-40; while(x<W+40){const w=30+r()*50;far.push({x,w,h:H*(0.05+r()*0.1)});x+=w-6;}
+    for(let i=0;i<6;i++)clouds.push({x:r()*W,y:H*(0.06+r()*0.22),s:0.6+r()*1.1,v:4+r()*8});
+    for(let i=0;i<70;i++)shimmer.push({x:r()*W,y:r(),l:8+r()*30,v:6+r()*14});
+  }
+  function size(){dpr=Math.min(window.devicePixelRatio||1,2);W=cv.clientWidth;H=cv.clientHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);build();}
+  function draw(t){
+    const p=REDUCE?0.6:(1-Math.cos(t/45000*Math.PI*2))/2*0.95+0.05; // 0 golden → 1 dusk
+    const hz=H*0.64, pan=REDUCE?0:Math.sin(t/18000)*14;
+    // sky
+    let g=ctx.createLinearGradient(0,0,0,hz);
+    g.addColorStop(0,mix("#7fa6c9","#1c2340",p));g.addColorStop(0.55,mix("#e9c79a","#7a4a6a",p));g.addColorStop(1,mix("#f6d7a4","#ef9a62",p));
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,hz+1);
+    // sun
+    const sx=W*0.8,sy=H*0.16+p*(hz-H*0.16)*0.92,sr=Math.max(18,Math.min(W,H)*0.05);
+    let sg=ctx.createRadialGradient(sx,sy,0,sx,sy,sr*5);sg.addColorStop(0,"rgba(255,230,170,.75)");sg.addColorStop(1,"rgba(255,200,120,0)");
+    ctx.fillStyle=sg;ctx.fillRect(0,0,W,hz);
+    ctx.fillStyle=mix("#fff3d1","#ffb066",p);ctx.beginPath();ctx.arc(sx,sy,sr,0,Math.PI*2);ctx.fill();
+    // stars at dusk
+    if(p>0.6){ctx.fillStyle=`rgba(255,255,255,${(p-0.6)*1.6})`;const r=rnd(7);for(let i=0;i<40;i++){ctx.fillRect(r()*W,r()*hz*0.45,1.2,1.2)}}
+    // clouds
+    clouds.forEach(c=>{const cx=((c.x+t/1000*c.v)%(W+300))-150;ctx.fillStyle=`rgba(255,${Math.round(240-p*80)},${Math.round(225-p*90)},${0.55-p*0.3})`;[[0,0,60],[40,8,45],[-40,10,40],[15,-12,38]].forEach(([dx,dy,r])=>{ctx.beginPath();ctx.ellipse(cx+dx*c.s,c.y+dy*c.s,r*c.s,r*0.55*c.s,0,0,Math.PI*2);ctx.fill()})});
+    // far hills
+    ctx.fillStyle=mix("#b59c86","#3b3550",p);ctx.beginPath();ctx.moveTo(0,hz);for(let x=0;x<=W;x+=8){ctx.lineTo(x,hz-H*0.09-Math.sin(x/170)*H*0.035-Math.sin(x/61)*H*0.012)}ctx.lineTo(W,hz);ctx.fill();
+    ctx.save();ctx.translate(pan*0.4,0);
+    ctx.fillStyle=mix("#a48b77","#2f2c45",p);far.forEach(b=>ctx.fillRect(b.x,hz-b.h,b.w,b.h));
+    ctx.restore();
+    // city
+    ctx.save();ctx.translate(pan,0);
+    city.forEach(b=>{
+      const top=hz-b.h;ctx.fillStyle=mix(b.shade>.5?"#8d725f":"#7a6455","#1d2034",p);ctx.fillRect(b.x,top,b.w,b.h);
+      ctx.fillStyle=`rgba(255,220,170,${0.25*(1-p)})`;ctx.fillRect(b.x,top,b.w*0.28,b.h);
+      const cw=b.w/b.cols,rh=b.h/b.rows;
+      for(let r=1;r<b.rows;r++)for(let c=0;c<b.cols;c++){const lit=p>b.thr[r*b.cols+c];ctx.fillStyle=lit?"rgba(255,214,140,.95)":`rgba(${mix("#d7c4a8","#2c3150",p).slice(4,-1)},.6)`;ctx.fillRect(b.x+c*cw+cw*0.25,top+r*rh-rh*0.55,cw*0.5,rh*0.42)}
+    });
+    ctx.restore();
+    // sea
+    g=ctx.createLinearGradient(0,hz,0,H);g.addColorStop(0,mix("#7a9db3","#3a3557",p));g.addColorStop(1,mix("#3c6077","#141a2c",p));
+    ctx.fillStyle=g;ctx.fillRect(0,hz,W,H-hz);
+    // sun glitter on water
+    for(let i=0;i<26;i++){const yy=hz+6+i*(H-hz)/26;const w=(sr*1.4)*(1+i*0.12)*(0.6+0.4*Math.sin(t/400+i));ctx.fillStyle=`rgba(255,${Math.round(220-p*60)},${Math.round(160-p*60)},${0.55-i*0.018})`;ctx.fillRect(sx-w/2+Math.sin(t/700+i)*6,yy,w,1.6)}
+    // city reflections at dusk
+    if(p>0.45){ctx.save();ctx.translate(pan,0);city.forEach(b=>{if(b.shade>0.3){ctx.fillStyle=`rgba(255,205,130,${(p-0.45)*0.35})`;for(let k=0;k<6;k++)ctx.fillRect(b.x+b.w*0.3+Math.sin(t/500+k+b.x)*3,hz+8+k*9,b.w*0.35,1.5)}});ctx.restore()}
+    // shimmer lines
+    ctx.fillStyle=`rgba(255,255,255,${0.18-p*0.08})`;shimmer.forEach(s=>{const y=hz+8+s.y*(H-hz-8);const x=((s.x+t/1000*s.v)%(W+60))-30;ctx.fillRect(x,y,s.l*(0.5+s.y),1)});
+    // birds
+    if(!REDUCE){ctx.strokeStyle=`rgba(30,30,40,${0.55-p*0.2})`;ctx.lineWidth=1.4;for(let i=0;i<3;i++){const bx=((t/1000*28+i*90)%(W+200))-100,by=H*0.22+i*14+Math.sin(t/600+i)*6,f=Math.sin(t/140+i)*4;ctx.beginPath();ctx.moveTo(bx-7,by-f);ctx.quadraticCurveTo(bx-3,by-2,bx,by);ctx.quadraticCurveTo(bx+3,by-2,bx+7,by-f);ctx.stroke()}}
+  }
+  let raf=0,visible=true;
+  function loop(t){draw(t);raf=requestAnimationFrame(loop)}
+  size();
+  if(REDUCE){draw(0)}else{raf=requestAnimationFrame(loop);
+    if("IntersectionObserver" in window){new IntersectionObserver(e=>{const v=e[0].isIntersecting;if(v&&!visible){raf=requestAnimationFrame(loop)}else if(!v&&visible){cancelAnimationFrame(raf)}visible=v}).observe(cv)}}
+  let rt;window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{size();if(REDUCE)draw(0)},120)});
+})();
+
+/* ---------- Count-up (final numbers already in HTML) ---------- */
+if(!REDUCE){document.querySelectorAll(".stats b").forEach(el=>{const to=+el.dataset.to,plus=el.hasAttribute("data-plus");const t0=performance.now();function step(n){const k=Math.min(1,(n-t0)/1400),v=Math.round(to*(1-Math.pow(1-k,3)));el.textContent=v+(plus?"+":"");if(k<1)requestAnimationFrame(step)}requestAnimationFrame(step)})}
+
+/* ---------- Demo listing photos (illustrated) ---------- */
+let gid=0;
+function sky(id,a,b){return`<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`}
+function tree(x,y,s,c){return`<rect x="${x-2*s}" y="${y-18*s}" width="${4*s}" height="${20*s}" fill="#5b4632"/><circle cx="${x}" cy="${y-26*s}" r="${14*s}" fill="${c}"/><circle cx="${x-9*s}" cy="${y-19*s}" r="${10*s}" fill="${c}"/><circle cx="${x+10*s}" cy="${y-20*s}" r="${10*s}" fill="${c}" opacity=".9"/>`}
+function exterior(i){
+  const k=++gid,[c1,c2,acc]=i.pal;
+  let s=`<defs>${sky("s"+k,"#8fb7d6","#f2dcc0")}<linearGradient id="g${k}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cfe3ef" stop-opacity=".95"/><stop offset=".5" stop-color="#7fa4bd"/><stop offset="1" stop-color="#3d5b70"/></linearGradient></defs>`;
+  s+=`<rect width="320" height="240" fill="url(#s${k})"/><circle cx="268" cy="44" r="18" fill="#fff4d6" opacity=".9"/>`;
+  s+=`<path d="M0 150 Q80 120 160 140 T320 130 V240 H0Z" fill="#9fb59a" opacity=".55"/>`;
+  if(i.tip==="Daire"){
+    if(i.deniz) s+=`<rect x="0" y="160" width="320" height="20" fill="#5d93b3"/><rect x="0" y="165" width="320" height="2" fill="#fff" opacity=".4"/>`;
+    s+=`<rect x="92" y="38" width="118" height="172" fill="${c1}"/><polygon points="210,38 236,50 236,210 210,210" fill="${c2}"/>`;
+    for(let r=0;r<6;r++){const y=50+r*26;s+=`<rect x="100" y="${y}" width="44" height="18" fill="url(#g${k})"/><rect x="152" y="${y}" width="50" height="18" fill="url(#g${k})"/><rect x="96" y="${y+17}" width="110" height="3" fill="#f5f2ea"/><rect x="96" y="${y+11}" width="110" height="6" fill="#bcd3df" opacity=".45"/><rect x="214" y="${y+2}" width="16" height="14" fill="#476377" opacity=".8"/>`}
+    s+=`<rect x="138" y="190" width="26" height="20" fill="#3b3b3b"/><rect x="0" y="208" width="320" height="32" fill="#c9c2b2"/><rect x="0" y="206" width="320" height="4" fill="#a49d8c"/>`;
+    s+=tree(52,212,1.2,"#4f7a45")+tree(272,212,1,"#5e8a50");
+  }else if(i.tip==="Villa"){
+    s+=`<rect x="0" y="176" width="320" height="64" fill="#86a86f"/>`;
+    s+=`<rect x="70" y="96" width="170" height="84" fill="${c1}"/><polygon points="58,100 155,58 252,100" fill="${acc}"/><polygon points="58,100 155,58 155,66 70,104" fill="#000" opacity=".12"/>`;
+    s+=`<rect x="84" y="112" width="40" height="26" fill="url(#g${k})"/><rect x="186" y="112" width="40" height="26" fill="url(#g${k})"/><rect x="134" y="132" width="42" height="48" fill="url(#g${k})"/><rect x="132" y="130" width="46" height="3" fill="#fff"/>`;
+    s+=`<rect x="84" y="148" width="40" height="22" fill="url(#g${k})"/><rect x="186" y="148" width="40" height="22" fill="url(#g${k})"/>`;
+    s+=`<rect x="40" y="194" width="150" height="30" rx="4" fill="#4fb0d1"/><path d="M48 204 h40 M100 212 h50 M60 218 h30" stroke="#d8f4ff" stroke-width="2" opacity=".8"/><rect x="40" y="190" width="150" height="5" fill="#e9e3d6"/>`;
+    s+=tree(268,190,1.4,"#6f8f55")+tree(30,182,0.9,"#5b7f49");
+  }else{
+    s+=`<rect x="20" y="60" width="280" height="150" fill="${c1}"/><rect x="20" y="60" width="280" height="40" fill="${c2}"/>`;
+    for(let w=0;w<5;w++)s+=`<rect x="${36+w*54}" y="68" width="36" height="24" fill="url(#g${k})"/>`;
+    s+=`<path d="M30 110 h260 l-10 22 h-240z" fill="${acc}"/>`;for(let q=0;q<9;q++)s+=`<rect x="${40+q*28}" y="110" width="14" height="22" fill="#fff" opacity=".35"/>`;
+    s+=`<rect x="44" y="136" width="170" height="70" fill="url(#g${k})"/><rect x="226" y="136" width="50" height="74" fill="#3d4a44"/><rect x="246" y="168" width="4" height="10" fill="#d9c08a"/>`;
+    s+=`<rect x="70" y="150" width="70" height="20" fill="#fff" opacity=".85"/><text x="105" y="164" font-family="Figtree,Arial" font-size="11" font-weight="700" text-anchor="middle" fill="#c0462f">KİRALIK</text>`;
+    s+=`<rect x="0" y="210" width="320" height="30" fill="#bdb6a6"/>`+tree(300,214,0.8,"#5e8a50");
+  }
+  return s;
+}
+function salon(i){
+  const k=++gid,[c1,c2,acc]=i.pal;
+  let s=`<defs>${sky("w"+k,"#9cc3de","#f3e0c4")}<linearGradient id="f${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b98e62"/><stop offset="1" stop-color="#8a6440"/></linearGradient><radialGradient id="l${k}" cx=".5" cy=".3" r=".7"><stop offset="0" stop-color="#fff6e0" stop-opacity=".55"/><stop offset="1" stop-color="#fff6e0" stop-opacity="0"/></radialGradient></defs>`;
+  s+=`<rect width="320" height="240" fill="#ece5d8"/><rect width="320" height="160" fill="${c1}" opacity=".35"/>`;
+  s+=`<rect x="170" y="26" width="120" height="110" fill="url(#w${k})"/><rect x="168" y="24" width="124" height="114" fill="none" stroke="#fff" stroke-width="5"/><line x1="230" y1="24" x2="230" y2="138" stroke="#fff" stroke-width="4"/>`;
+  if(i.deniz) s+=`<rect x="170" y="100" width="120" height="36" fill="#5d93b3"/>`;
+  s+=`<rect x="0" y="160" width="320" height="80" fill="url(#f${k})"/>`;for(let p=0;p<8;p++)s+=`<line x1="${p*46}" y1="160" x2="${p*46-30}" y2="240" stroke="#6e4f33" stroke-opacity=".35"/>`;
+  s+=`<rect width="320" height="240" fill="url(#l${k})"/>`;
+  s+=`<ellipse cx="130" cy="206" rx="110" ry="20" fill="${acc}" opacity=".55"/>`;
+  s+=`<rect x="34" y="132" width="170" height="46" rx="10" fill="${c2}"/><rect x="34" y="114" width="170" height="30" rx="10" fill="${c2}" opacity=".85"/><rect x="26" y="128" width="20" height="50" rx="8" fill="${c2}"/><rect x="192" y="128" width="20" height="50" rx="8" fill="${c2}"/>`;
+  s+=`<rect x="56" y="120" width="34" height="24" rx="6" fill="#f2e6cf"/><rect x="150" y="120" width="34" height="24" rx="6" fill="${acc}"/>`;
+  s+=`<rect x="90" y="190" width="80" height="8" rx="3" fill="#5a4330"/><rect x="96" y="198" width="4" height="14" fill="#5a4330"/><rect x="160" y="198" width="4" height="14" fill="#5a4330"/><circle cx="112" cy="184" r="6" fill="#e8d7b3"/>`;
+  s+=`<rect x="64" y="40" width="70" height="48" fill="#f7f1e4" stroke="#7a6a52" stroke-width="3"/><path d="M70 82 L90 60 L104 72 L116 58 L128 82Z" fill="${c1}"/>`;
+  s+=`<line x1="250" y1="150" x2="250" y2="200" stroke="#444" stroke-width="2"/><path d="M236 150 h28 l-6 -22 h-16z" fill="#f2e6cf"/>`;
+  s+=`<rect x="290" y="168" width="20" height="26" fill="#a26d4a"/>${tree(300,170,0.7,"#4f7a45")}`;
+  return s;
+}
+function mutfak(i){
+  const k=++gid,[c1,c2,acc]=i.pal;
+  let s=`<defs><pattern id="t${k}" width="16" height="12" patternUnits="userSpaceOnUse"><rect width="16" height="12" fill="#f4f1ea"/><path d="M0 0 h16 M0 0 v12" stroke="#d8d1c2"/></pattern></defs>`;
+  s+=`<rect width="320" height="240" fill="#efe9de"/><rect x="0" y="198" width="320" height="42" fill="#cbbfa9"/>`;
+  s+=`<rect x="20" y="20" width="280" height="56" fill="${c2}"/>`;for(let d=0;d<7;d++)s+=`<rect x="${24+d*40}" y="24" width="36" height="48" fill="${c2}" stroke="#000" stroke-opacity=".15"/><rect x="${50+d*40}" y="60" width="2" height="8" fill="#d6c08a"/>`;
+  s+=`<rect x="20" y="76" width="280" height="44" fill="url(#t${k})"/>`;
+  s+=`<rect x="20" y="120" width="280" height="8" fill="#f6f3ec"/><rect x="20" y="128" width="280" height="70" fill="${c2}"/>`;for(let d=0;d<7;d++)s+=`<rect x="${24+d*40}" y="132" width="36" height="62" fill="${c2}" stroke="#000" stroke-opacity=".15"/>`;
+  s+=`<rect x="120" y="104" width="60" height="16" rx="2" fill="#7c7c7c"/><rect x="200" y="92" width="34" height="28" fill="#2f2f2f"/><rect x="40" y="100" width="22" height="20" fill="${acc}" rx="3"/><circle cx="70" cy="112" r="7" fill="#c0462f"/>`;
+  s+=`<rect x="70" y="162" width="180" height="12" fill="#f6f3ec"/><rect x="76" y="174" width="168" height="40" fill="${c1}"/>`;
+  for(let x of [100,160,220]) s+=`<line x1="${x}" y1="0" x2="${x}" y2="12" stroke="#333"/><path d="M${x-12} 24 h24 l-6 -12 h-12z" fill="${acc}"/><circle cx="${x}" cy="26" r="7" fill="#fff3c8" opacity=".6"/>`;
+  for(let x of [100,150,200]) s+=`<rect x="${x}" y="186" width="22" height="6" rx="3" fill="#3a3a3a"/><rect x="${x+9}" y="192" width="4" height="40" fill="#3a3a3a"/>`;
+  return s;
+}
+function ic(i){
+  const k=++gid,[c1,c2,acc]=i.pal;
+  let s=`<rect width="320" height="240" fill="#e9e6df"/><rect x="0" y="180" width="320" height="60" fill="#bfb8aa"/>`;
+  s+=`<rect x="20" y="30" width="180" height="120" fill="#a9c4d4" opacity=".7"/><rect x="18" y="28" width="184" height="124" fill="none" stroke="#333" stroke-width="4"/><line x1="110" y1="28" x2="110" y2="152" stroke="#333" stroke-width="3"/>`;
+  s+=`<rect x="220" y="60" width="80" height="120" fill="${c2}"/>`;for(let r=0;r<4;r++)s+=`<rect x="226" y="${68+r*28}" width="68" height="4" fill="#f4f1ea"/><rect x="${232+r*8}" y="${50+r*28+10}" width="10" height="14" fill="${acc}"/>`;
+  s+=`<rect x="40" y="160" width="140" height="30" fill="${c1}"/><rect x="36" y="156" width="148" height="6" fill="#f6f3ec"/>`;
+  for(let x of [70,150,250]) s+=`<rect x="${x-14}" y="0" width="28" height="6" fill="#333"/><circle cx="${x}" cy="10" r="5" fill="#fff2c4"/>`;
+  return s;
+}
+function photos(i){
+  const v=i.tip==="İş yeri"?[["Dış cephe",exterior],["İç mekan",ic]]:[["Dış cephe",exterior],["Salon",salon],["Mutfak",mutfak]];
+  return v.map(([ad,fn])=>({ad,svg:`<svg viewBox="0 0 320 240" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${i.baslik} – ${ad} (demo görsel)">${fn(i)}</svg>`}));
+}
+
+/* ---------- Listings ---------- */
+const ilanlar=[
+  {id:"ZG-2481",tur:"satilik",tip:"Daire",oda:"3+1",m2:135,kat:"4. kat",fiyat:6850000,baslik:"Deniz manzaralı, asansörlü 3+1",yer:"Merkez · Sahil yoluna 300 m",pal:["#e7d9bf","#cdb995","#b5832f"],deniz:true,yas:0,yeni:true},
+  {id:"ZG-2477",tur:"kiralik",tip:"Daire",oda:"2+1",m2:95,kat:"2. kat",fiyat:24000,baslik:"Eşyalı, doğalgazlı 2+1",yer:"Çarşı · Metroya 5 dk",pal:["#d9c9b5","#b9a58c","#7d9a6e"],yas:1,yeni:true},
+  {id:"ZG-2470",tur:"satilik",tip:"Villa",oda:"4+1",m2:240,kat:"Müstakil",fiyat:15900000,baslik:"Havuzlu müstakil villa",yer:"Yazlık bölgesi · Bahçe 600 m²",pal:["#f1e8d8","#8b9d7c","#b9573a"],yas:2},
+  {id:"ZG-2466",tur:"kiralik",tip:"İş yeri",oda:"—",m2:80,kat:"Zemin",fiyat:38000,baslik:"Cadde üzeri dükkan",yer:"Ana cadde · Yüksek yaya trafiği",pal:["#d2cbbd","#5c6a5f","#3f5a3c"],yas:3},
+  {id:"ZG-2459",tur:"satilik",tip:"Daire",oda:"1+1",m2:62,kat:"3. kat",fiyat:3450000,baslik:"Yatırımlık yeni bina 1+1",yer:"Üniversite çevresi · Kira getirisi yüksek",pal:["#dfe2dd","#9aa7a3","#c08a3e"],yas:4},
+  {id:"ZG-2452",tur:"kiralik",tip:"Daire",oda:"3+1",m2:140,kat:"5. kat",fiyat:32000,baslik:"Site içinde otoparklı 3+1",yer:"Yeni yerleşim · Güvenlikli site",pal:["#e6dccb","#8e7b66","#3f5a3c"],deniz:true,yas:5}
+];
+const tl=n=>n.toLocaleString("tr-TR")+" TL";
+const state={tur:"all"};
+const grid=document.getElementById("grid"),count=document.getElementById("count");
+const galleries=[];
+function card(i){
+  const ph=photos(i);
+  return `<article class="card" data-id="${i.id}">
+    <div class="gal" data-n="${ph.length}" data-i="0">
+      <div class="slides">${ph.map(p=>`<div class="slide">${p.svg}</div>`).join("")}</div>
+      <span class="tag ${i.tur==="kiralik"?"kira":""}">${i.tur==="kiralik"?"Kiralık":"Satılık"}</span>
+      ${i.yeni?`<span class="new">YENİ</span>`:""}
+      <button class="nav-b prev" type="button" aria-label="Önceki fotoğraf">‹</button>
+      <button class="nav-b next" type="button" aria-label="Sonraki fotoğraf">›</button>
+      <div class="gal-foot"><span class="cap">1/${ph.length} · ${ph[0].ad}</span><div class="dots">${ph.map((_,n)=>`<button type="button" aria-label="Fotoğraf ${n+1}" ${n===0?'aria-current="true"':""}></button>`).join("")}</div></div>
+    </div>
+    <div class="body"><div class="price">${tl(i.fiyat)}${i.tur==="kiralik"?" <small>/ ay</small>":""}</div><h3>${i.baslik}</h3><div class="loc">${i.yer}</div><div class="specs"><span>${i.tip}</span>${i.oda!=="—"?`<span>${i.oda}</span>`:""}<span>${i.m2} m²</span><span>${i.kat}</span></div><div class="ilan">İlan no: ${i.id} · Demo görseller</div></div>
+  </article>`;
+}
+function go(g,n){
+  const max=+g.dataset.n;n=(n+max)%max;g.dataset.i=n;
+  g.querySelector(".slides").style.transform=`translateX(-${n*100}%)`;
+  g.querySelectorAll(".dots button").forEach((d,x)=>d.setAttribute("aria-current",x===n?"true":"false"));
+  const ad=g.querySelectorAll(".slide svg")[n].getAttribute("aria-label").split("– ")[1].replace(" (demo görsel)","");
+  g.querySelector(".cap").textContent=`${n+1}/${max} · ${ad}`;
+}
+function render(){
+  const oda=document.getElementById("f-oda").value,tip=document.getElementById("f-tip").value,s=document.getElementById("f-sirala").value;
+  let list=ilanlar.filter(i=>(state.tur==="all"||i.tur===state.tur)&&(!oda||i.oda===oda)&&(!tip||i.tip===tip));
+  list.sort((a,b)=>s==="ucuz"?a.fiyat-b.fiyat:s==="pahali"?b.fiyat-a.fiyat:a.yas-b.yas);
+  count.textContent=list.length+" ilan (örnek)";
+  grid.innerHTML=list.length?list.map(card).join(""):`<div class="empty">Bu kriterlere uygun ilan yok. Filtreleri değiştirin ya da bize yazın, size özel arayalım.</div>`;
+  grid.querySelectorAll(".gal").forEach(g=>{
+    g.querySelector(".prev").onclick=()=>go(g,+g.dataset.i-1);
+    g.querySelector(".next").onclick=()=>go(g,+g.dataset.i+1);
+    g.querySelectorAll(".dots button").forEach((d,x)=>d.onclick=()=>go(g,x));
+    g.addEventListener("mouseenter",()=>g.dataset.hold="1");g.addEventListener("mouseleave",()=>g.dataset.hold="");
+  });
+}
+document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{
+  state.tur=b.dataset.type;
+  document.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));
+  render();
+}));
+["f-oda","f-tip","f-sirala"].forEach(id=>document.getElementById(id).addEventListener("change",render));
+document.getElementById("form").addEventListener("submit",e=>{e.preventDefault();document.getElementById("ok").hidden=false;});
+render();
+/* gentle auto-advance, one card at a time */
+if(!REDUCE){let turn=0;setInterval(()=>{const gs=[...grid.querySelectorAll(".gal")];if(!gs.length)return;const g=gs[turn%gs.length];turn++;if(!g.dataset.hold)go(g,+g.dataset.i+1)},1800)}
+</script>
+</body>
+</html>
